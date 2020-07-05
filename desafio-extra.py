@@ -57,16 +57,19 @@ def main():
     file = st.file_uploader("Escolha um arquivo no formato 'CSV'", type='csv')
     if file:
         st.subheader('Estatística descritiva univariada')
-        dataframe = pd.read_csv(file, sep=separador)
-        aux = pd.DataFrame({'colunas':dataframe.columns,
-                            'tipos':dataframe.dtypes,
-                            'percental_faltando': (dataframe.isna().sum()/dataframe.shape[0])*100})
+        df = pd.read_csv(file, sep=separador)
+        aux = pd.DataFrame({'colunas':df.columns,
+                            'tipos':df.dtypes,
+                            'percental_faltando': (df.isna().sum()/df.shape[0])*100})
         col_numericas = list(aux[aux['tipos'] != 'object']['colunas'])
         col_objects = list(aux[aux['tipos'] == 'object']['colunas'])
-        colunas = list(dataframe.columns)
+        colunas = list(df.columns)
+        st.dataframe(aux[['tipos', 'percental_faltando']])
+        st.markdown("###Escolha as colunas que deseja analisar")
+        col = st.multiselect("Atributos", colunas, default=colunas[:3])
+        dataframe = df[col].copy()
         slider = st.slider('Escolha o numero de Linhas', 5, dataframe.shape[0])
         st.dataframe(dataframe.head(slider))
-        st.dataframe(aux[['tipos', 'percental_faltando']])
 
         col = st.selectbox('Selecione a coluna :', col_numericas)
         if col:
